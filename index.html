@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汽车通信测试平台 - 文件上传与解析</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 全局头部 -->
+    <header class="global-header">
+        <div class="header-left">
+            <h1>Nyonic</h1>
+        </div>
+        <div class="header-right">
+            <span>Ben|超级管理员</span>
+        </div>
+    </header>
+
+    <!-- 页面容器 -->
+    <div class="page-container">
+        <!-- 左侧导航栏 -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3>导航菜单</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">🏠</span>
+                        <span class="menu-text">首页</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">📋</span>
+                        <span class="menu-text">用例管理</span>
+                    </a>
+                    <ul class="sub-menu">
+                        <li class="sub-menu-item">
+                            <a href="#" class="sub-menu-link">项目管理</a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="#" class="sub-menu-link">项目需求管理</a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="#" class="sub-menu-link">需求片段管理</a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="#" class="sub-menu-link">需求片段评审</a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="#" class="sub-menu-link">测试用例列表</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-item active">
+                    <a href="#" class="menu-link" data-menu="script">
+                        <span class="menu-icon">📁</span>
+                        <span class="menu-text">脚本管理</span>
+                        <span class="menu-arrow">▼</span>
+                    </a>
+                    <ul class="sub-menu expanded">
+                        <li class="sub-menu-item active">
+                            <a href="#" class="sub-menu-link" data-page="script-project">项目管理</a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="#" class="sub-menu-link" data-page="project-detail">项目详情</a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="#" class="sub-menu-link" data-page="experiment-setup">项目文件管理</a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="#" class="sub-menu-link" data-page="logic-check">逻辑检查</a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="#" class="sub-menu-link" data-page="script-result">脚本结果</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">⚙️</span>
+                        <span class="menu-text">系统管理</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- DBC上传与信号匹配页面 -->
+            <div id="page-dbc-upload" class="page-content">
+                <!-- 页面标题 -->
+                <div class="page-title">
+                    <h2>DBC上传与信号匹配</h2>
+                </div>
+
+                <!-- 文件上传区域 -->
+                <section class="upload-section">
+                    <div class="upload-container">
+                        <div class="upload-drag-area" id="uploadArea">
+                            <div class="upload-icon">📁</div>
+                            <p class="upload-text">拖拽文件到此处或点击上传</p>
+                            <p class="file-types">Supported: DBC / LDF / ARXML / CDD / PDX</p>
+                            <button class="upload-button" id="uploadButton">Upload</button>
+                            <input type="file" id="fileInput" multiple accept=".dbc,.ldf,.arxml,.cdd,.pdx" style="display: none;">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 文件列表区域 -->
+                <section class="file-list-section">
+                    <div class="section-header">
+                        <h3>文件列表</h3>
+                    </div>
+                    <div class="file-list-container">
+                        <table class="file-list-table" id="fileListTable">
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>File Type</th>
+                                    <th>Upload Time</th>
+                                    <th>Parse Status</th>
+                                    <th>Message Count</th>
+                                    <th>Signal Count</th>
+                                    <th>Node Count</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fileListBody">
+                                <!-- 示例数据 -->
+                                <tr>
+                                    <td>vehicle.dbc</td>
+                                    <td>DBC</td>
+                                    <td>2026-03-12 10:00</td>
+                                    <td><span class="status-badge parsed">Parsed</span></td>
+                                    <td>120</td>
+                                    <td>350</td>
+                                    <td>5</td>
+                                    <td>
+                                        <button class="action-button view">View</button>
+                                        <button class="action-button delete">Delete</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>system.arxml</td>
+                                    <td>ARXML</td>
+                                    <td>2026-03-12 10:05</td>
+                                    <td><span class="status-badge parsed">Parsed</span></td>
+                                    <td>80</td>
+                                    <td>250</td>
+                                    <td>3</td>
+                                    <td>
+                                        <button class="action-button view">View</button>
+                                        <button class="action-button delete">Delete</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>diag.cdd</td>
+                                    <td>CDD</td>
+                                    <td>2026-03-12 10:10</td>
+                                    <td><span class="status-badge parsed">Parsed</span></td>
+                                    <td>40</td>
+                                    <td>120</td>
+                                    <td>2</td>
+                                    <td>
+                                        <button class="action-button view">View</button>
+                                        <button class="action-button delete">Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 主要内容区域 -->
+                <div class="main-content-area">
+                    <!-- 左侧：通信模型树 -->
+                    <div class="model-tree-section">
+                        <div class="section-header">
+                            <h3>Communication Model</h3>
+                        </div>
+                        <div class="model-tree-container" id="modelTree">
+                            <ul class="tree">
+                                <li class="tree-node">
+                                    <span class="tree-node-toggle">▼</span>
+                                    <span class="tree-node-label">Nodes</span>
+                                    <ul class="tree-children">
+                                        <li class="tree-node"><span class="tree-node-label">BCM</span></li>
+                                        <li class="tree-node"><span class="tree-node-label">EngineECU</span></li>
+                                        <li class="tree-node"><span class="tree-node-label">Gateway</span></li>
+                                    </ul>
+                                </li>
+                                <li class="tree-node">
+                                    <span class="tree-node-toggle">▼</span>
+                                    <span class="tree-node-label">Messages</span>
+                                    <ul class="tree-children">
+                                        <li class="tree-node">
+                                            <span class="tree-node-toggle">▼</span>
+                                            <span class="tree-node-label">EngineStatus</span>
+                                            <ul class="tree-children">
+                                                <li class="tree-node"><span class="tree-node-label">EngineRPM</span></li>
+                                                <li class="tree-node"><span class="tree-node-label">EngineTemp</span></li>
+                                            </ul>
+                                        </li>
+                                        <li class="tree-node">
+                                            <span class="tree-node-toggle">▼</span>
+                                            <span class="tree-node-label">SpeedInfo</span>
+                                            <ul class="tree-children">
+                                                <li class="tree-node"><span class="tree-node-label">VehicleSpeed</span></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="tree-node">
+                                    <span class="tree-node-toggle">▼</span>
+                                    <span class="tree-node-label">Signals</span>
+                                    <ul class="tree-children">
+                                        <li class="tree-node"><span class="tree-node-label">EngineRPM</span></li>
+                                        <li class="tree-node"><span class="tree-node-label">EngineTemp</span></li>
+                                        <li class="tree-node"><span class="tree-node-label">VehicleSpeed</span></li>
+                                    </ul>
+                                </li>
+                                <li class="tree-node">
+                                    <span class="tree-node-toggle">▼</span>
+                                    <span class="tree-node-label">Diagnostics</span>
+                                    <ul class="tree-children">
+                                        <li class="tree-node"><span class="tree-node-label">SessionControl</span></li>
+                                        <li class="tree-node"><span class="tree-node-label">ReadData</span></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：详情信息 -->
+                    <div class="detail-section">
+                        <div class="section-header detail-header">
+                            <h3>Detail View</h3>
+                            <button class="more-button">More</button>
+                        </div>
+                        <div class="detail-tabs">
+                            <button class="tab-button active">Nodes</button>
+                            <button class="tab-button">MessagesDetail</button>
+                            <button class="tab-button">Diagnostics</button>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-placeholder">
+                                <p>Select a node to view details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 项目管理页面 -->
+            <div id="page-script-project" class="page-content active">
+                <!-- 页面标题 -->
+                <div class="page-title">
+                    <h2>项目管理</h2>
+                </div>
+
+                <!-- 操作栏 -->
+                <div class="action-bar">
+                    <button class="primary-button" id="newProjectBtn">
+                        <span class="button-icon">+</span>
+                        新建项目
+                    </button>
+                    <div class="search-box">
+                        <input type="text" id="projectSearchInput" placeholder="搜索项目..." />
+                        <span class="search-icon">🔍</span>
+                    </div>
+                </div>
+
+                <!-- 项目列表表格 -->
+                <div class="project-list-container">
+                    <table class="project-list-table">
+                        <thead>
+                            <tr>
+                                <th width="40"></th>
+                                <th>项目名称</th>
+                                <th>负责人</th>
+                                
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectListBody">
+                            <tr>
+                                <td><span class="expand-icon">▶</span></td>
+                                <td>EngineTest</td>
+                                <td>略</td>
+                                <td><span class="status-badge ongoing">正在进行</span></td>
+                                <td>2026-03-16</td>
+                                <td>
+                                    <button class="action-button-small enter">进入</button>
+                                    <button class="action-button-small edit">编辑</button>
+                                    <button class="action-button-small delete">删除</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="expand-icon">▶</span></td>
+                                <td>ADAS_Test</td>
+                                <td>略</td>
+                                <td><span class="status-badge completed">已完成</span></td>
+                                <td>2026-03-15</td>
+                                <td>
+                                    <button class="action-button-small enter">进入</button>
+                                    <button class="action-button-small edit">编辑</button>
+                                    <button class="action-button-small delete">删除</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="expand-icon">▶</span></td>
+                                <td>ABS_Project</td>
+                                <td>略</td>
+                                <td><span class="status-badge not-started">未开始</span></td>
+                                <td>2026-03-14</td>
+                                <td>
+                                    <button class="action-button-small enter">进入</button>
+                                    <button class="action-button-small edit">编辑</button>
+                                    <button class="action-button-small delete">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 项目文件管理页面 -->
+            <div id="page-experiment-setup" class="page-content">
+                <!-- 页面标题 -->
+                <div class="page-title">
+                    <h2>项目文件管理</h2>
+                </div>
+
+                <!-- 项目信息卡片 -->
+                <section class="project-info-section">
+                    <div class="section-header">
+                        <h3 id="currentProjectName">项目：EngineTest</h3>
+                    </div>
+                    <div class="project-info-card">
+                        <div class="info-item">
+                            <label class="info-label">实验名称：</label>
+                            <span class="info-value" id="currentExperimentName">Engine Test v1</span>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label">实验描述：</label>
+                            <span class="info-value" id="currentExperimentDesc">发动机功能验证</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 输入文件区域 -->
+                <section class="input-files-section">
+                    <div class="section-header">
+                        <h3>输入文件</h3>
+                    </div>
+                    <div class="input-files-container">
+                        <!-- 测试用例文件 -->
+                        <div class="file-input-group">
+                            <div class="file-label">测试用例：</div>
+                            <div class="file-upload-container">
+                                <button class="file-upload-button" id="testcaseUploadBtn">上传 Excel</button>
+                                <input type="file" id="testcaseFileInput" accept=".xlsx,.xls" style="display: none;">
+                            </div>
+                            <div class="file-status-container">
+                                <span class="file-status" id="testcaseStatus">test_case.xlsx</span>
+                            </div>
+                            <div class="file-actions">
+                                <button class="action-button-small edit-file">编辑</button>
+                                <button class="action-button-small delete-file">删除</button>
+                            </div>
+                        </div>
+                        
+                        <!-- DBC文件 -->
+                        <div class="file-input-group">
+                            <div class="file-label">DBC文件：</div>
+                            <div class="file-upload-container">
+                                <button class="file-upload-button" id="dbcUploadBtn">上传 DBC</button>
+                                <input type="file" id="dbcFileInput" accept=".dbc" style="display: none;">
+                            </div>
+                            <div class="file-status-container">
+                                <span class="file-status" id="dbcStatus">powertrain.dbc</span>
+                            </div>
+                            <div class="file-actions">
+                                <button class="action-button-small edit-file">编辑</button>
+                                <button class="action-button-small delete-file">删除</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 其他文件 -->
+                        <div class="file-input-group">
+                            <div class="file-label">其他文件（可选）：</div>
+                            <div class="file-upload-container">
+                                <button class="file-upload-button" id="otherUploadBtn">上传</button>
+                                <input type="file" id="otherFileInput" accept=".cdd,.pdx,.arxml" style="display: none;">
+                            </div>
+                            <div class="file-status-container">
+                                <span class="file-status" id="otherStatus">diagnostic.cdd</span>
+                            </div>
+                            <div class="file-actions">
+                                <button class="action-button-small edit-file">编辑</button>
+                                <button class="action-button-small delete-file">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 解析状态区域 -->
+                <section class="parse-status-section">
+                    <div class="section-header">
+                        <h3>解析状态：<span class="status-text" id="parseStatusText">解析完成</span></h3>
+                    </div>
+                    <div class="parse-stats-container">
+                        <div class="stat-item">
+                            <span class="stat-label">用例数量：</span>
+                            <span class="stat-value" id="testcaseCount">124</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">功能点：</span>
+                            <span class="stat-value" id="functionCount">8</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">信号数量：</span>
+                            <span class="stat-value" id="signalCount">680</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 测试对象输入区域 -->
+                <section class="ecu-input-section">
+                    <div class="section-header">
+                        <h3>测试对象</h3>
+                    </div>
+                    <div class="ecu-input-container">
+                        <div class="input-group">
+                            <label for="ecuNames">请输入测试对象（可输入一个或多个，用逗号分隔）：</label>
+                            <input type="text" id="ecuNames" class="ecu-input" placeholder="例如：整车，ABS ECU，BCM">
+                            <div class="input-hint">支持输入多个测试对象，用逗号分隔</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 用例预览区域 -->
+                <section class="testcase-preview-section project-file-preview">
+                    <div class="section-header">
+                        <h3>用例预览</h3>
+                    </div>
+                    <div class="testcase-preview-layout">
+                        <!-- 左侧：功能点列表 -->
+                        <div class="function-point-sidebar">
+                            <div class="function-point-header">
+                                <h4>功能点</h4>
+                            </div>
+                            <div class="function-point-sidebar-content" id="functionPointSidebar">
+
+                                <div class="function-point-sidebar-item" data-function="验证发动机启动功能">
+                                    <input type="checkbox" class="function-point-checkbox" id="function-engine-start">
+                                    <label for="function-engine-start" class="point-name">验证发动机启动功能</label>
+                                </div>
+                                <div class="function-point-sidebar-item" data-function="验证ABS制动系统">
+                                    <input type="checkbox" class="function-point-checkbox" id="function-abs">
+                                    <label for="function-abs" class="point-name">验证ABS制动系统</label>
+                                </div>
+                                <div class="function-point-sidebar-item" data-function="验证变速箱换挡功能">
+                                    <input type="checkbox" class="function-point-checkbox" id="function-transmission">
+                                    <label for="function-transmission" class="point-name">验证变速箱换挡功能</label>
+                                </div>
+                                <div class="function-point-sidebar-item" data-function="验证制动系统性能">
+                                    <input type="checkbox" class="function-point-checkbox" id="function-brake">
+                                    <label for="function-brake" class="point-name">验证制动系统性能</label>
+                                </div>
+                                <div class="function-point-sidebar-item" data-function="验证发动机停止功能">
+                                    <input type="checkbox" class="function-point-checkbox" id="function-engine-stop">
+                                    <label for="function-engine-stop" class="point-name">验证发动机停止功能</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 右侧：测试用例表格 -->
+                        <div class="testcase-preview-container">
+                            <table class="testcase-preview-table">
+                                <thead>
+                                    <tr>
+                                        <th>Project Name</th>
+                                        <th>Section Index</th>
+                                        <th>Module</th>
+                                        <th>Function Title</th>
+                                        <th>Initials</th>
+                                        <th>Actions</th>
+                                        <th>Expected Results</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody id="testcasePreviewBody">
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>1</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>2</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>3</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>4</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>5</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>6</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>7</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>8</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>9</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>10</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机启动功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>11</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>12</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>13</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>14</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>15</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>16</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>17</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>18</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>19</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>20</td>
+                                    <td>ABS</td>
+                                    <td>验证ABS制动系统</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>21</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>22</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>23</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>24</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>25</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>26</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>27</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>28</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>29</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>30</td>
+                                    <td>Transmission</td>
+                                    <td>验证变速箱换挡功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>31</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>32</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>33</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>34</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>35</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>36</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>37</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>38</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>39</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>40</td>
+                                    <td>Brake</td>
+                                    <td>验证制动系统性能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>41</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>42</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>43</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>44</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>45</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>46</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>47</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>48</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>49</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                                <tr>
+                                    <td>EngineTest</td>
+                                    <td>50</td>
+                                    <td>Engine</td>
+                                    <td>验证发动机停止功能</td>
+                                    <td>略</td>
+                                    <td>略</td>
+                                    <td>略</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </section>
+
+                <!-- 操作按钮 -->
+                <div class="action-buttons">
+                    <button class="next-button" id="nextButton">下一步</button>
+                </div>
+            </div>
+
+            <div id="page-testcase-group" class="page-content">
+                <div class="blank-page">
+                    <div class="blank-icon">📊</div>
+                    <h2>测试用例分组</h2>
+                    <p>该功能正在开发中...</p>
+                </div>
+            </div>
+
+            <!-- 项目详情页面 -->
+            <div id="page-project-detail" class="page-content">
+                <!-- 页面标题 -->
+                <div class="page-title">
+                    <h2 id="projectDetailTitle">项目详情 - EngineTest</h2>
+                </div>
+
+                <!-- 项目信息 -->
+                <section class="project-header-section">
+                    <div class="project-header">
+                        <h3 id="projectName">EngineTest</h3>
+                        <div class="project-actions">
+                            <button class="primary-button" id="newExperimentBtn">
+                                <span class="button-icon">+</span>
+                                新建实验
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 实验列表 -->
+                <section class="experiment-list-section">
+                    <div class="experiment-list-container">
+                        <table class="experiment-list-table">
+                            <thead>
+                                <tr>
+                                    <th>实验名称/第几次</th>
+                                    <th>创建时间</th>
+                                    <th>输入文件</th>
+                                    <th>输出结果</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="experimentListBody">
+                                <tr data-experiment-name="Engine Test v1" data-experiment-desc="发动机功能验证">
+                                    <td>
+                                        <div class="experiment-name">Engine Test v1</div>
+                                        <div class="experiment-version">第1次</div>
+                                    </td>
+                                    <td>2026-03-17 10:30</td>
+                                    <td>
+                                        <div class="file-list">
+                                            <div class="file-item">test_case.xlsx</div>
+                                            <div class="file-item">powertrain.dbc</div>
+                                            <div class="file-item">diagnostic.cdd</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="action-button-small view-result">查看结果</button>
+                                    </td>
+                                    <td>
+                                        <button class="action-button-small enter-experiment">进入</button>
+                                        <button class="action-button-small delete-experiment">删除</button>
+                                    </td>
+                                </tr>
+                                <tr data-experiment-name="Engine Test v2" data-experiment-desc="发动机性能测试">
+                                    <td>
+                                        <div class="experiment-name">Engine Test v2</div>
+                                        <div class="experiment-version">第2次</div>
+                                    </td>
+                                    <td>2026-03-16 14:20</td>
+                                    <td>
+                                        <div class="file-list">
+                                            <div class="file-item">test_case_v2.xlsx</div>
+                                            <div class="file-item">powertrain_v2.dbc</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="action-button-small view-result">查看结果</button>
+                                    </td>
+                                    <td>
+                                        <button class="action-button-small enter-experiment">进入</button>
+                                        <button class="action-button-small delete-experiment">删除</button>
+                                    </td>
+                                </tr>
+                                <tr data-experiment-name="Engine Test v3" data-experiment-desc="发动机可靠性测试">
+                                    <td>
+                                        <div class="experiment-name">Engine Test v3</div>
+                                        <div class="experiment-version">第3次</div>
+                                    </td>
+                                    <td>2026-03-15 09:15</td>
+                                    <td>
+                                        <div class="file-list">
+                                            <div class="file-item">test_case_v3.xlsx</div>
+                                            <div class="file-item">powertrain_v3.dbc</div>
+                                            <div class="file-item">diagnostic_v3.cdd</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="action-button-small view-result">查看结果</button>
+                                    </td>
+                                    <td>
+                                        <button class="action-button-small enter-experiment">进入</button>
+                                        <button class="action-button-small delete-experiment">删除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 新建实验右侧滑出面板 -->
+            <div class="slide-panel-overlay" id="experimentPanelOverlay"></div>
+            <div class="slide-panel" id="newExperimentPanel">
+                <div class="slide-panel-header">
+                    <h3>新建实验</h3>
+                    <button class="close-panel-btn" id="closeExperimentPanel">×</button>
+                </div>
+                <div class="slide-panel-content">
+                    <div class="form-group">
+                        <label for="experimentName">实验名称 <span class="required">*</span></label>
+                        <input type="text" id="experimentName" placeholder="请输入实验名称" />
+                    </div>
+                    <div class="form-group">
+                        <label for="experimentDesc">实验描述</label>
+                        <textarea id="experimentDesc" placeholder="请输入实验描述（可选）" rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="slide-panel-footer">
+                    <button class="secondary-button" id="cancelNewExperiment">取消</button>
+                    <button class="primary-button" id="confirmNewExperiment">创建</button>
+                </div>
+            </div>
+
+            <div id="page-logic-check" class="page-content">
+                <!-- 页面标题 -->
+                <div class="page-title">
+                    <h2>逻辑检查</h2>
+                </div>
+
+                <!-- 项目信息卡片 -->
+                <section class="project-info-section">
+                    <div class="section-header">
+                        <h3 id="logicProjectName">项目：EngineTest</h3>
+                    </div>
+                    <div class="project-info-card">
+                        <div class="info-item">
+                            <label class="info-label">实验名称：</label>
+                            <span class="info-value" id="logicExperimentName">Engine Test v1</span>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label">测试对象：</label>
+                            <span class="info-value" id="logicEcuNames">未设置</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 测试用例预览和代码对比区域 -->
+                <section class="logic-check-content">
+                    <!-- 功能点Tab -->
+                    <div class="function-point-tabs-container">
+                        <div class="function-point-tabs" id="functionPointTabs">
+                        </div>
+                    </div>
+
+                    <!-- 测试用例预览区域 -->
+                    <section class="testcase-preview-section logic-testcase-preview">
+                        <div class="section-header">
+                            <h3>测试用例预览</h3>
+                        </div>
+                        <div class="testcase-preview-container">
+                            <table class="testcase-preview-table">
+                                <thead>
+                                    <tr>
+                                        <th>Project Name</th>
+                                        <th>Section Index</th>
+                                        <th>Module</th>
+                                        <th>Function Title</th>
+                                        <th>Initials</th>
+                                        <th>Actions</th>
+                                        <th>Expected Results</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logicTestcasePreviewBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- 进度条区域 -->
+                    <section class="progress-section">
+                        <div class="progress-container logic-progress">
+                            <div class="progress-title">AI生成中……</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progressBar"></div>
+                            </div>
+                            <div class="progress-percentage" id="progressPercentage">0%</div>
+                        </div>
+                    </section>
+
+                    <!-- 代码对比区域 -->
+                    <section class="code-compare-section">
+                        <!-- 文件名Tab -->
+                        <div class="file-tabs-container">
+                            <div class="file-tabs" id="fileTabs">
+                            </div>
+                        </div>
+                        <div class="code-compare-layout">
+                            <!-- 左侧：AI生成结果（不可编辑） -->
+                            <div class="code-panel left-panel">
+                                <div class="code-panel-header">
+                                    <h4>AI生成结果</h4>
+                                </div>
+                                <div class="code-block-container">
+                                    <pre class="code-block readonly" id="aiGeneratedCode" contenteditable="false">
+# AI生成的代码示例
+def test_engine_start():
+    # 发动机启动测试
+    print("Starting engine...")
+    return True
+                                    </pre>
+                                </div>
+                                <div class="code-panel-footer">
+                                    <!-- 占位符，保持与右侧面板对齐 -->
+                                </div>
+                            </div>
+                            
+                            <!-- 右侧：修正代码（允许编辑） -->
+                            <div class="code-panel right-panel">
+                                <div class="code-panel-header">
+                                    <h4>修正代码（可编辑）</h4>
+                                </div>
+                                <div class="code-block-container">
+                                    <pre class="code-block editable" id="originalCode" contenteditable="true">
+# 修正代码示例
+def test_engine_start():
+    # 发动机启动测试
+    print("Starting engine...")
+    return True
+                                    </pre>
+                                </div>
+                                <div class="code-panel-footer">
+                                    <button class="primary-button confirm-btn" id="logicCheckConfirmBtn">保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 操作按钮 -->
+                    <div class="logic-action-buttons">
+                        <button class="primary-button next-step-btn" id="logicCheckNextPageBtn" disabled>下一步</button>
+                    </div>
+                </section>
+            </div>
+
+            <div id="page-script-result" class="page-content">
+                <!-- 页面标题 -->
+                <div class="page-title">
+                    <h2>脚本结果</h2>
+                </div>
+
+                <!-- 项目信息卡片 -->
+                <section class="project-info-section">
+                    <div class="section-header">
+                        <h3 id="scriptProjectName">项目：EngineTest</h3>
+                    </div>
+                    <div class="project-info-card">
+                        <div class="info-item">
+                            <label class="info-label">实验名称：</label>
+                            <span class="info-value" id="scriptExperimentName">Engine Test v1</span>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label">测试对象：</label>
+                            <span class="info-value" id="scriptEcuNames">未设置</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 本次勾选功能点区域 -->
+                <section class="testcase-preview-section script-testcase-preview">
+
+                    <div class="script-result-layout">
+                        <!-- 左侧：功能点列表 -->
+                        <div class="function-point-panel">
+                            <div class="function-point-header">
+                                <h4>本次勾选功能点：</h4>
+                            </div>
+                            <div class="function-point-sidebar-content" id="scriptFunctionPointSidebar">
+                            </div>
+                        </div>
+                        
+                        <!-- 右侧：脚本文件列表 -->
+                        <div class="script-file-panel">
+                            <div class="file-list-header">
+                                <h3>脚本文件</h3>
+                                <div class="header-buttons">
+                                    <button class="download-all-btn" id="downloadAllBtn" style="display: none;">下载全部</button>
+                                    <button class="finish-btn" id="finishBtn" style="display: none;">结束本次生成</button>
+                                </div>
+                            </div>
+                            <!-- 进度条区域 -->
+                            <div class="progress-section script-progress-section">
+                                <div class="progress-container script-progress">
+                                    <div class="progress-title">AI生成中……</div>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar" id="scriptProgressBar"></div>
+                                    </div>
+                                    <div class="progress-percentage" id="scriptProgressPercentage">0%</div>
+                                </div>
+                            </div>
+                            <div class="file-list-content" id="scriptFileList" style="display: none;">
+                                <div class="script-file-item" data-file="test_engine.py">
+                                    <span class="file-icon">📄</span>
+                                    <span class="file-name">test_engine.py</span>
+                                </div>
+                                <div class="script-file-item" data-file="test_abs.py">
+                                    <span class="file-icon">📄</span>
+                                    <span class="file-name">test_abs.py</span>
+                                </div>
+                                <div class="script-file-item" data-file="test_transmission.py">
+                                    <span class="file-icon">📄</span>
+                                    <span class="file-name">test_transmission.py</span>
+                                </div>
+                                <div class="script-file-item" data-file="test_brake.py">
+                                    <span class="file-icon">📄</span>
+                                    <span class="file-name">test_brake.py</span>
+                                </div>
+                                <div class="script-file-item" data-file="config.py">
+                                    <span class="file-icon">📄</span>
+                                    <span class="file-name">config.py</span>
+                                </div>
+                                <div class="script-file-item" data-file="utils.py">
+                                    <span class="file-icon">📄</span>
+                                    <span class="file-name">utils.py</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+
+        </main>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="script.js"></script>
+</body>
+</html>
